@@ -12,7 +12,7 @@ def num_check(question, error, num_type):
             response = num_type(input(question))
 
             if response <= 0:
-                print(eror)
+                print(error)
             else:
                 return response
 
@@ -74,6 +74,17 @@ def get_expenses(var_fixed):
         quantity_list.append(quantity)
         price_list.append(price)
 
+    expense_frame = pd.DataFrame(variable_dict)
+
+    sub_total = expense_frame["Price"].sum()
+
+    return expense_frame, sub_total
+
+
+# Prints the expenses of the user
+def expense_print(heading, frame, subtotal):
+    pritn(f"\n**** {heading} Costs ****\n\n")
+    print(f"{frame}\n\n{heading} Costs: ${subtotal:.2f}")
 
 # RECYCLED FUNCTIONS
 
@@ -117,17 +128,23 @@ def yes_no(question):
 
 # Main routine...
 
+
 # Get product name
 product_name = not_blank("\nProduct name\n~~~ ",
                          "The product name "
                          "shouldn't be blank.")
+
+print("\nPlease enter your variable costs below\n")
 
 # Get variable costs
 variable_expense = get_expenses("variable")
 variable_frame = variable_expense[0]
 variable_sub = variable_expense[1]
 
-# Get fixed costs
-fixed_expenses = get_expense("fixed")
-fixed_frame = fixed_expenses[0]
-fixed_sub = fixed_expenses[1]
+have_fixed = yes_no("\nDo you have fixed costs? y/n")
+
+if have_fixed == "yes":
+    # Get fixed costs
+    fixed_expenses = get_expenses("fixed")
+    fixed_frame = fixed_expenses[0]
+    fixed_sub = fixed_expenses[1]
