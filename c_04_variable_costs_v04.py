@@ -53,7 +53,7 @@ def get_expenses(var_fixed):
                               " can't be blank")
 
         if item_name == "xxx":
-            break
+            retun item_name
 
         if var_fixed == "variable":
             quantity = num_check("Quantity\n~~~ ",

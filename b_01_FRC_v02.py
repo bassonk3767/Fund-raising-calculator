@@ -141,7 +141,7 @@ variable_expense = get_expenses("variable")
 variable_frame = variable_expense[0]
 variable_sub = variable_expense[1]
 
-have_fixed = yes_no("\nDo you have fixed costs? y/n")
+have_fixed = yes_no("\nDo you have fixed costs? y/n\n~~~ ")
 
 if have_fixed == "yes":
     # Get fixed costs
