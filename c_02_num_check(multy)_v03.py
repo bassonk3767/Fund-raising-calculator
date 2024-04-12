@@ -5,7 +5,7 @@
 
 # multy number type checker
 def num_check(question, error, num_type):
-    valid = false
+    valid = False
     while not valid:
 
         try:
