@@ -1,5 +1,6 @@
 # Imports...
 import pandas as pd
+import math as ma
 
 # Functions...
 
@@ -23,7 +24,6 @@ def num_check(question, error, num_type):
 # Gets expense, returns list which has
 # the data frame and subtotal
 def get_expenses(var_fixed):
-
     # Lowering case of the variable to
     # in-rich programming usability
     var_fixed.lower()
@@ -82,12 +82,15 @@ def get_expenses(var_fixed):
 
 
 # Prints the expenses of the user
-def expense_print(heading, frame, subtotal):
-    pritn(f"\n**** {heading} Costs ****\n\n")
-    print(f"{frame}\n\n{heading} Costs: ${subtotal:.2f}")
+# def expense_print(heading, frame, subtotal):
+#     print(f"\n**** {heading} Costs ****\n\n")
+#     print(f"{frame}\n\n{heading} Costs: ${subtotal:.2f}")
+
 
 # Finds the profit goal
 def profit_goal(total_costs):
+    amount = ""
+
     # Initialize variables and error message
     error = "\n\nPlease enter a valid profit gaol\n"
 
@@ -112,7 +115,7 @@ def profit_goal(total_costs):
             profit_type = "%"
 
             # Get amount (everything before %
-            amount = response[-1]
+            amount += response[-1]
 
         else:
             # set amount to response for now
@@ -151,15 +154,20 @@ def profit_goal(total_costs):
         if profit_type == "$":
             return amount
         else:
-            goal = (amount / 100)*total_costs
+            goal = (amount / 100) * total_costs
             return goal
+
+
+# Calculates the rounded value
+# of a given number as input
+def round_up(amount, round_to):
+    return int(ma.ceil(amount / round_to)) * round_to
 
 
 # RECYCLED FUNCTIONS
 
 # Checks if user input is blank
 def not_blank(question, error):
-
     # Looping to get user's answer
     while True:
 
@@ -180,7 +188,6 @@ def currency(x):
 
 # Yes no checker
 def yes_no(question):
-
     # Looping to get the user's answer
     while True:
         response = input(question).lower()
@@ -211,13 +218,15 @@ product_name = not_blank("\nProduct name\n~~~ ",
 how_many = num_check("\n\nHow many items?\n~~~ ",
                      "\n\nIt can't be 0", int)
 
-
 print("\nPlease enter your variable costs below\n")
 
 # Get variable costs
 variable_expense = get_expenses("variable")
 variable_frame = variable_expense[0]
 variable_sub = variable_expense[1]
+
+variable_frame_txt = pd.DataFrame.to_string(variable_frame)
+variable_sub_txt = f"Variable Costs Subtotal: ${variable_sub:.2f}\n"
 
 have_fixed = yes_no("\nDo you have fixed costs? y/n\n~~~ ")
 
@@ -226,8 +235,15 @@ if have_fixed == "yes":
     fixed_expenses = get_expenses("fixed")
     fixed_frame = fixed_expenses[0]
     fixed_sub = fixed_expenses[1]
+
+    fixed_frame_txt = pd.DataFrame.to_string(fixed_frame)
+    fixed_sub_txt = f"Fixed Costs Subtotal: ${fixed_sub:.2f}\n"
+
 else:
     fixed_sub = 0
+
+    fixed_frame_txt = ""
+    fixed_sub_txt = ""
 
 # Work out total costs and profit target
 all_costs = variable_sub + fixed_sub
@@ -236,19 +252,48 @@ profit_target = profit_goal(all_costs)
 # Calculate recommended price
 # and then write th data to
 # a separate file
+total_costs = all_costs + profit_target
+selling_price = total_costs / how_many
 
-selling_price = 0
+# round recommended price
+recommended_price = round_up(selling_price,5)
 
-print(f"\n\n**** Fund Raising - {product_namew} ****")
-expense_print("Variable", variable_frame, variable_sub)
+heading = f"\n\n**** Fund Raising - {product_name} ****"
+# expense_print("Variable", variable_frame, variable_sub)
+
+variable_heading_txt = "\n==== Variable Costs ====="
 
 if have_fixed == "yes":
-    expense_print("Fixed", fixed_frame[["Cost"]], fixed_sub)
+    fixed_heading_txt = "\n===== Fixed Costs ======"
+    #     expense_print("Fixed", fixed_frame[["Cost"]], fixed_sub)
 
-print(f"\n\n**** Total Costs: ${profit_target:.2f} ****")
-print("\n**** Profit & Sale Targets ****")
+else:
+    fixed_heading_txt = ""
 
-print(f"\n\n**** Profit Target: ${profit_target:.2f}")
-print(f"\n**** Total Sales: ${all_costs+profit_target:.2f} ****")
+total_costs_str = f"\n\n**** Total Costs: ${profit_target:.2f} ****\n"
+sales_advice_txt = "\n**** Profit & Sale Targets ****"
 
-print(f"\n\n**** Recommended selling price: ${selling_price:.2f}")
+profit_target_txt = f"\n\n**** Profit Target: ${profit_target:.2f}"
+total_sales_str = f"\n**** Total Sales: ${all_costs + profit_target:.2f} ****"
+
+recommended_selling_string = f"\n\n**** Recommended selling price: ${selling_price:.2f}"
+
+to_write = [heading, variable_heading_txt, variable_frame_txt, variable_sub_txt,
+            fixed_heading_txt, fixed_frame_txt, fixed_sub_txt,
+            total_costs_str, sales_advice_txt, profit_target_txt, total_sales_str,
+            recommended_selling_string]
+
+filename = product_name
+
+# printing area
+for item in to_write:
+    print(item)
+
+# write output to file
+# Create file to hold data (add .txt extension)
+write_to_filename = "{}.txt".format(filename)
+text_file = open(write_to_filename, "w+")
+
+for item in to_write:
+    text_file.write(item)
+    text_file.write("\n")
